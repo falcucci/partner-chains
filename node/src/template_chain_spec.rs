@@ -39,6 +39,7 @@ pub fn chain_spec() -> Result<ChainSpec, EnvVarReadError> {
 			},
 			..Default::default()
 		},
+		dummy_session_for_grandpa_session: Default::default(),
 		session_committee_management: SessionCommitteeManagementConfig {
 			// Same as SessionConfig
 			initial_authorities: vec![],

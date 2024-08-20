@@ -157,6 +157,7 @@ pub fn staging_genesis(
 			},
 			..Default::default()
 		},
+		dummy_session_for_grandpa_session: Default::default(),
 		session_committee_management: SessionCommitteeManagementConfig {
 			initial_authorities: initial_authorities
 				.into_iter()

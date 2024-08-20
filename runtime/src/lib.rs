@@ -325,6 +325,48 @@ impl pallet_aura::Config for Runtime {
 	type SlotDuration = ConstU64<SLOT_DURATION>;
 }
 
+// TODO: Move it to pallet-partner-chains-session, because it is part of proper stubbing of pallet-session
+// that is required for pallet-grandpa to work correctly with pallet-partner-chains-session.
+pub struct DummySession;
+
+impl<T> pallet_session::ShouldEndSession<T> for DummySession {
+	fn should_end_session(_: T) -> bool {
+		false
+	}
+}
+
+impl<T> pallet_session::SessionManager<T> for DummySession {
+	fn new_session(_: SessionIndex) -> Option<Vec<T>> {
+		None
+	}
+
+	fn end_session(_: SessionIndex) {}
+
+	fn start_session(_: SessionIndex) {}
+}
+
+impl<T> sp_runtime::traits::Convert<T, Option<T>> for DummySession {
+	fn convert(t: T) -> Option<T> {
+		Some(t)
+	}
+}
+
+
+
+// TODO: should we define a macro that would properly define pallet_session, pallet_session_validator_management and pallet_partner_chains_session
+// TODO: no 2. Do we really need both pallet_session_validator_management and pallet_partner_chains_session?
+impl pallet_session::Config for Runtime {
+	type RuntimeEvent = RuntimeEvent;
+	type ValidatorId = <Self as frame_system::Config>::AccountId;
+	type ValidatorIdOf = DummySession;
+	type ShouldEndSession = DummySession;
+	type NextSessionRotation = ();
+	type SessionManager = DummySession;
+	type SessionHandler = <SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
+	type Keys = SessionKeys;
+	type WeightInfo = ();
+}
+
 impl pallet_grandpa::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 
@@ -482,7 +524,12 @@ construct_runtime!(
 		SessionCommitteeManagement: pallet_session_validator_management,
 		#[cfg(feature = "block-beneficiary")]
 		BlockRewards: pallet_block_rewards,
-		// The order matters!! Session pallet needs to come last for correct initialization order
+		// pallet_grandpa depends on pallet_session CurrentIndex storage.
+		// Only dummy implementation of pallet_session should be wired.
+		// Partner Chains session_manager ValidatorManagementSessionManager write to this storage.
+		// It is wired in by pallet_partner_chains_session.
+		DummySessionForGrandpaSession: pallet_session,
+		// The order matters!! pallet_partner_chains_session needs to come last for correct initialization order,
 		Session: pallet_partner_chains_session,
 	}
 );

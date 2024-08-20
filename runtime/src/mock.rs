@@ -44,6 +44,7 @@ frame_support::construct_runtime!(
 		Aura: pallet_aura,
 		Grandpa: pallet_grandpa,
 		Balances: pallet_balances,
+		Session0: pallet_session,
 		Session: pallet_partner_chains_session,
 	}
 );
@@ -101,6 +102,7 @@ impl pallet_balances::Config for Test {
 	type RuntimeFreezeReason = RuntimeFreezeReason;
 }
 
+use crate::DummySession;
 use sp_consensus_aura::AURA_ENGINE_ID;
 use sp_partner_chains_session::CurrentSessionIndex;
 use sp_staking::SessionIndex;
@@ -120,6 +122,18 @@ impl From<(sr25519::Public, ed25519::Public)> for TestSessionKeys {
 		let grandpa = GrandpaId::from(grandpa);
 		Self { aura, grandpa }
 	}
+}
+
+impl pallet_session::Config for Test {
+	type RuntimeEvent = RuntimeEvent;
+	type ValidatorId = <Self as frame_system::Config>::AccountId;
+	type ValidatorIdOf = DummySession;
+	type ShouldEndSession = DummySession;
+	type NextSessionRotation = ();
+	type SessionManager = DummySession;
+	type SessionHandler = <TestSessionKeys as OpaqueKeys>::KeyTypeIdProviders;
+	type Keys = TestSessionKeys;
+	type WeightInfo = ();
 }
 
 impl pallet_partner_chains_session::Config for Test {

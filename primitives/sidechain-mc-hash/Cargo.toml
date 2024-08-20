@@ -8,6 +8,7 @@ description = "Logic for putting a main chain block reference in digest and inhe
 async-trait = { workspace = true }
 main-chain-follower-api = { workspace = true, features = ["block-source"] }
 sp-consensus-slots = { workspace = true }
+sp-partner-chains-consensus-aura = { workspace = true, features = ["std"] }
 sidechain-domain = { workspace = true, features = ["std"] }
 sp-consensus = { workspace = true }
 sp-inherents = { workspace = true, features = ["std"] }

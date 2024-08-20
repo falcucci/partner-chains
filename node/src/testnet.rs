@@ -197,6 +197,7 @@ pub fn testnet_genesis(
 			slots_per_epoch: SlotsPerEpoch(from_var_or("SLOTS_PER_EPOCH", 60)?),
 			..Default::default()
 		},
+		dummy_session_for_grandpa_session: Default::default(),
 		session_committee_management: SessionCommitteeManagementConfig {
 			initial_authorities: initial_authorities
 				.into_iter()
