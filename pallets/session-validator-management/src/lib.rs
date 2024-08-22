@@ -18,7 +18,7 @@ pub use weights::WeightInfo;
 #[frame_support::pallet]
 pub mod pallet {
 	use super::*;
-	use frame_support::pallet_prelude::*;
+	use frame_support::pallet_prelude::{DispatchResult, *};
 	use frame_system::pallet_prelude::*;
 	use log::{info, warn};
 	use sp_runtime::traits::{One, Zero};
@@ -250,6 +250,27 @@ pub mod pallet {
 				epoch: for_epoch_number,
 				committee: validators,
 			});
+			Ok(())
+		}
+
+		/// Changes the main chain scripts used for committee rotation.
+		///
+		/// This extrinsic must be run either using `sudo` or some other chain governance mechanism.
+		#[pallet::call_index(1)]
+		#[pallet::weight(1)]
+		pub fn set_main_chain_scripts(
+			origin: OriginFor<T>,
+			committee_candidate_address: MainchainAddress,
+			d_parameter_policy: PolicyId,
+			permissioned_candidates_policy: PolicyId,
+		) -> DispatchResult {
+			ensure_root(origin)?;
+			let new_scripts = MainChainScripts {
+				committee_candidate_address,
+				d_parameter_policy,
+				permissioned_candidates_policy,
+			};
+			MainChainScriptsConfiguration::<T>::put(new_scripts);
 			Ok(())
 		}
 	}

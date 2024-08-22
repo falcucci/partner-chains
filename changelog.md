@@ -13,6 +13,7 @@ This changelog is based on [Keep A Changelog](https://keepachangelog.com/en/1.1.
 ## Fixed
 
 ## Added
+* Extrinsic `set_main_chain_scripts` for migrating to new committee selection main chain scripts
 
 # v1.0.0rc1
 
