@@ -1,7 +1,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use scale_info::TypeInfo;
-pub use sidechain_domain::{MainchainAddress, PolicyId};
+use sidechain_domain::{MainchainAddress, PolicyId};
 use sp_core::{Decode, Encode, MaxEncodedLen};
 use sp_inherents::{InherentIdentifier, IsFatalError};
 

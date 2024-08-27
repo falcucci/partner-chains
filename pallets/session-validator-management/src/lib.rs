@@ -21,6 +21,7 @@ pub mod pallet {
 	use frame_support::pallet_prelude::*;
 	use frame_system::pallet_prelude::*;
 	use log::{info, warn};
+	use sidechain_domain::{MainchainAddress, PolicyId};
 	use sp_runtime::traits::{One, Zero};
 	use sp_session_validator_management::*;
 	use sp_std::fmt::Display;
