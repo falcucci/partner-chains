@@ -159,6 +159,7 @@ substrate-frame-rpc-system = { default-features = false, git = "https://github.c
 substrate-prometheus-endpoint = { package = "substrate-prometheus-endpoint", git = "https://github.com/input-output-hk/polkadot-sdk.git", tag = "partnerchains-stable2407" }
 substrate-wasm-builder = { default-features = false, git = "https://github.com/input-output-hk/polkadot-sdk.git", tag = "partnerchains-stable2407" }
 sp-genesis-builder = { default-features = false, git = "https://github.com/input-output-hk/polkadot-sdk.git", tag = "partnerchains-stable2407" }
+sc-network-test = { default-features = false, git = "https://github.com/input-output-hk/polkadot-sdk.git", tag ="partnerchains-stable2407" }
 
 # local dependencies
 sidechain-runtime = { path = "runtime" }

@@ -103,6 +103,7 @@ hex-literal = { workspace = true }
 minicbor = { workspace = true }
 time-source = { workspace = true, features = ["mock"] }
 assert_cmd = { workspace = true }
+sc-network-test = { workspace = true }
 
 [features]
 default = [
