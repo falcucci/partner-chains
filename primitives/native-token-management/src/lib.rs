@@ -35,12 +35,26 @@ pub struct TokenTransferData {
 #[cfg(feature = "std")]
 mod inherent_provider {
 	use super::*;
-	use main_chain_follower_api::{DataSourceError, NativeTokenManagementDataSource};
 	use sidechain_mc_hash::get_mc_hash_for_block;
 	use sp_api::{ApiError, ProvideRuntimeApi};
 	use sp_blockchain::HeaderBackend;
 	use std::error::Error;
 	use std::sync::Arc;
+
+	#[async_trait::async_trait]
+	pub trait NativeTokenManagementDataSource {
+		type Error;
+
+		/// Retrieves total of native token transfers into the illiquid supply in the range (after_block, to_block]
+		async fn get_total_native_token_transfer(
+			&self,
+			after_block: Option<McBlockHash>,
+			to_block: McBlockHash,
+			native_token_policy_id: PolicyId,
+			native_token_asset_name: AssetName,
+			illiquid_supply_address: MainchainAddress,
+		) -> Result<NativeTokenAmount, Self::Error>;
+	}
 
 	pub struct NativeTokenManagementInherentDataProvider {
 		pub token_amount: NativeTokenAmount,
@@ -49,7 +63,7 @@ mod inherent_provider {
 	#[derive(thiserror::Error, sp_runtime::RuntimeDebug)]
 	pub enum IDPCreationError {
 		#[error("Failed to read native token data from data source: {0:?}")]
-		DataSourceError(#[from] DataSourceError),
+		DataSourceError(Box<dyn Error + Send + Sync>),
 		#[error("Failed to retrieve main chain scripts from the runtime: {0:?}")]
 		GetMainChainScriptsError(ApiError),
 		#[error("Failed to retrieve previous MC hash: {0:?}")]
@@ -57,9 +71,9 @@ mod inherent_provider {
 	}
 
 	impl NativeTokenManagementInherentDataProvider {
-		pub async fn new<Block, C>(
+		pub async fn new<Block, C, E>(
 			client: Arc<C>,
-			data_source: &(dyn NativeTokenManagementDataSource + Send + Sync),
+			data_source: &(dyn NativeTokenManagementDataSource<Error = E> + Send + Sync),
 			mc_hash: McBlockHash,
 			parent_hash: <Block as BlockT>::Hash,
 		) -> Result<Self, IDPCreationError>
@@ -68,6 +82,7 @@ mod inherent_provider {
 			C: HeaderBackend<Block>,
 			C: ProvideRuntimeApi<Block> + Send + Sync,
 			C::Api: NativeTokenManagementApi<Block>,
+			E: std::error::Error + Send + Sync + 'static,
 		{
 			let api = client.runtime_api();
 			let scripts = api
@@ -84,7 +99,8 @@ mod inherent_provider {
 					scripts.native_token_asset_name,
 					scripts.illiquid_supply_address,
 				)
-				.await?;
+				.await
+				.map_err(|err| IDPCreationError::DataSourceError(Box::new(err)))?;
 
 			Ok(Self { token_amount })
 		}
@@ -111,6 +127,41 @@ mod inherent_provider {
 				panic!("BUG: {:?} inherent shouldn't return any errors", INHERENT_IDENTIFIER)
 			} else {
 				None
+			}
+		}
+	}
+
+	#[cfg(any(test, feature = "mock"))]
+	pub mod mock {
+		use crate::NativeTokenManagementDataSource;
+		use async_trait::async_trait;
+		use core::marker::PhantomData;
+		use derive_new::new;
+		use sidechain_domain::*;
+		use std::collections::HashMap;
+
+		#[derive(new, Default)]
+		pub struct MockNativeTokenDataSource<Err> {
+			transfers: HashMap<(Option<McBlockHash>, McBlockHash), NativeTokenAmount>,
+			_marker: PhantomData<Err>,
+		}
+
+		#[async_trait]
+		impl<Err> NativeTokenManagementDataSource for MockNativeTokenDataSource<Err>
+		where
+			Err: std::error::Error + Send + Sync,
+		{
+			type Error = Err;
+
+			async fn get_total_native_token_transfer(
+				&self,
+				after_block: Option<McBlockHash>,
+				to_block: McBlockHash,
+				_native_token_policy_id: PolicyId,
+				_native_token_asset_name: AssetName,
+				_illiquid_supply_address: MainchainAddress,
+			) -> Result<NativeTokenAmount, Self::Error> {
+				Ok(self.transfers.get(&(after_block, to_block)).cloned().unwrap_or_default())
 			}
 		}
 	}
