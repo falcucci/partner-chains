@@ -18,7 +18,7 @@ pub use weights::WeightInfo;
 #[frame_support::pallet]
 pub mod pallet {
 	use super::*;
-	use frame_support::pallet_prelude::{DispatchResult, *};
+	use frame_support::pallet_prelude::*;
 	use frame_system::pallet_prelude::*;
 	use log::{info, warn};
 	use sp_runtime::traits::{One, Zero};
@@ -257,7 +257,7 @@ pub mod pallet {
 		///
 		/// This extrinsic must be run either using `sudo` or some other chain governance mechanism.
 		#[pallet::call_index(1)]
-		#[pallet::weight(1)]
+		#[pallet::weight(T::WeightInfo::set(1))]
 		pub fn set_main_chain_scripts(
 			origin: OriginFor<T>,
 			committee_candidate_address: MainchainAddress,
