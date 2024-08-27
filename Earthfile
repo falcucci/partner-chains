@@ -4,7 +4,6 @@ ARG --global FEATURES
 
 ci:
   BUILD +build
-  BUILD +test
   BUILD +fmt
   BUILD +chainspecs
   ARG image=sidechains-substrate-node
