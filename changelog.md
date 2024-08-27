@@ -7,6 +7,10 @@ This changelog is based on [Keep A Changelog](https://keepachangelog.com/en/1.1.
 ## Changed
 
 * moved out some cli related code from `node` crate, in order to require less copy-paste in users nodes
+* moved `sc-consensus-aura` from input-output-hk/polkadot-sdk fork to this repository,
+  to `sc-partner-chains-consensus-aura` and `sp-partner-chains-consensus-aura`.
+  This change requires migration of the node, PartnerChainsProposerFactory has to be used.
+  See `service.rs` in `partner-chains-node` crate for an example.
 
 ## Removed
 
