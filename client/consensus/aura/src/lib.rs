@@ -305,7 +305,6 @@ where
 		self.env
 			.init(block)
 			.map_err(|e| ConsensusError::ClientImport(format!("{:?}", e)))
-			//.map(|try_fut| {try_fut.map(|proposer|block_proposal::wrap_proposer::<B, E>(proposer))})
 			.boxed()
 	}
 
