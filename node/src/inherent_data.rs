@@ -83,7 +83,7 @@ where
 			epoch_config,
 			parent_hash,
 			*slot,
-			data_sources.candidate.as_ref(),
+			data_sources.selection.as_ref(),
 			mc_hash.mc_epoch(),
 		)
 		.await?;
@@ -166,7 +166,7 @@ where
 			epoch_config,
 			parent_hash,
 			verified_block_slot,
-			data_sources.candidate.as_ref(),
+			data_sources.selection.as_ref(),
 			mc_state_reference.epoch,
 		)
 		.await?;

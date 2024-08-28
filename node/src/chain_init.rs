@@ -146,7 +146,7 @@ where
 {
 	let scripts = api.get_main_chain_scripts(block_hash)?;
 	let authority_selection_inputs = match AuthoritySelectionInputs::from_mc_data(
-		data_sources.candidate.as_ref(),
+		data_sources.selection.as_ref(),
 		McEpochNumber(epoch_no),
 		scripts,
 	)

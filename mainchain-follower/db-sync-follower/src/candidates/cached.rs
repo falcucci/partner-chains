@@ -5,10 +5,11 @@
 
 use crate::candidates::CandidatesDataSourceImpl;
 use async_trait::async_trait;
+use authority_selection_inherents::authority_selection_inputs::AuthoritySelectionDataSource;
 use figment::{providers::Env, Figment};
 use log::info;
 use lru::LruCache;
-use main_chain_follower_api::{candidate::*, Result};
+use main_chain_follower_api::{candidate::*, DataSourceError, Result};
 use serde::Deserialize;
 use sidechain_domain::*;
 use std::{
@@ -70,6 +71,45 @@ impl CandidateDataSource for CandidateDataSourceCached {
 
 	async fn data_epoch(&self, for_epoch: McEpochNumber) -> Result<McEpochNumber> {
 		self.inner.data_epoch(for_epoch).await
+	}
+}
+
+#[async_trait]
+impl AuthoritySelectionDataSource for CandidateDataSourceCached {
+	type Error = DataSourceError;
+
+	async fn get_ariadne_parameters(
+		&self,
+		epoch_number: McEpochNumber,
+		d_parameter: PolicyId,
+		permissioned_candidates: PolicyId,
+	) -> std::result::Result<
+		authority_selection_inherents::authority_selection_inputs::AriadneParameters,
+		Self::Error,
+	> {
+		todo!()
+	}
+
+	async fn get_candidates(
+		&self,
+		epoch: McEpochNumber,
+		committee_candidate_address: MainchainAddress,
+	) -> std::result::Result<Vec<CandidateRegistrations>, Self::Error> {
+		todo!()
+	}
+
+	async fn get_epoch_nonce(
+		&self,
+		epoch: McEpochNumber,
+	) -> std::result::Result<Option<EpochNonce>, Self::Error> {
+		todo!()
+	}
+
+	async fn data_epoch(
+		&self,
+		for_epoch: McEpochNumber,
+	) -> std::result::Result<McEpochNumber, Self::Error> {
+		todo!()
 	}
 }
 
